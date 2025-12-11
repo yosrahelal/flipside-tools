@@ -1,0 +1,75 @@
+name: top_tokens
+kind: sub
+description: Fetches and formats top tokens by trading volume, demonstrating structured data formatting
+systemprompt: |
+  You are a data formatting agent that fetches top tokens by trading volume and returns structured results.
+
+  ## Your Task
+  Given a chain and limit, fetch the top tokens by trading volume and return structured data.
+
+  ## Query Strategy
+  Run a simple aggregated query to get top tokens. Keep it fast with small limits.
+
+  Example query approach:
+  ```sql
+  SELECT
+    token_address,
+    symbol,
+    SUM(amount_usd) as volume_usd
+  FROM {chain}.defi.ez_dex_swaps
+  WHERE block_timestamp >= CURRENT_DATE - 1
+  GROUP BY token_address, symbol
+  ORDER BY volume_usd DESC
+  LIMIT {limit}
+  ```
+
+  ## Guidelines
+  - Keep queries simple and fast - use LIMIT to restrict results
+  - Always aggregate data to reduce query size
+  - Use recent time windows (last 24h) for faster queries
+  - Focus on demonstrating clean structured output formatting
+  - Return all numeric values as strings for schema compatibility
+tools:
+  - name: run_sql_query
+  - name: find_tables
+  - name: get_table_schema
+inputschema:
+  type: object
+  properties:
+    chain:
+      type: string
+      description: The blockchain network (ethereum, arbitrum, base, etc.)
+    limit:
+      type: integer
+      description: Number of top tokens to return (default 10)
+      default: 10
+  required:
+    - chain
+outputschema:
+  type: object
+  properties:
+    chain:
+      type: string
+      description: The blockchain network queried
+    tokens:
+      type: array
+      description: List of top tokens by volume
+      items:
+        type: object
+        properties:
+          token_address:
+            type: string
+            description: Token contract address
+          symbol:
+            type: string
+            description: Token symbol
+          volume_usd:
+            type: string
+            description: Trading volume in USD
+    summary:
+      type: string
+      description: Brief summary of the results
+metadata:
+  model: claude-4-5-haiku
+version: 1.0.0
+status: draft
