@@ -1,32 +1,27 @@
-# Flipside Tools
+# Flipside CLI
 
 Build and deploy AI agents for blockchain analytics. Query 40+ chains, analyze wallets, track DeFi protocols, and more.
 
 ## Install
-Mac or Linux users:
-```
+
+**Mac/Linux:**
+```bash
 curl -fsSL https://raw.githubusercontent.com/FlipsideCrypto/flipside-tools/main/install.sh | sh
 ```
-Windows user: Download the latest exe from releases (or use `wsl`)
+
+**Windows:** Download the latest exe from [releases](https://github.com/flipsidecrypto/flipside-cli/releases) or use `wsl`
 
 ## Quick Start
 
-**1. Get an API key** from [Flipside](https://flipsidecrypto.xyz/chat/settings/mcp-keys)
-
-**2. Configure the CLI**
 ```bash
-flipside config init
-flipside config set apiKey fk_....
-```
+# 1. Initialize with your API key (get one at flipsidecrypto.xyz/chat/settings/mcp-keys)
+flipside init
 
-**3. Verify it works**
-```bash
-flipside whoami
-```
+# 2. Generate example agents in current directory
+flipside quickstart ./flipside-agents && cd flipside-agents
 
-**4. Deploy your first agent**
-```bash
-flipside agent push examples/defi_analyst.agent.yaml
+# 3. Deploy and run an example
+flipside agent push defi_analyst.agent.yaml
 flipside agent run defi_analyst --message "What's the TVL on Aave?"
 ```
 
@@ -36,7 +31,7 @@ That's it! You now have a DeFi analyst agent ready to query blockchain data.
 
 ## Example Agents
 
-Two example agents in [examples/](./examples/):
+After running `flipside quickstart`, you'll have these example agents:
 
 | Agent | Type | What it does |
 |-------|------|--------------|
@@ -144,9 +139,7 @@ flipside chat repl
 
 ---
 
-## Stay up to date
-
-Use the built in updater to stay up to date.
+## Stay Up to Date
 
 ```bash
 flipside update
@@ -157,6 +150,10 @@ flipside update
 ## Command Reference
 
 ```bash
+# Setup
+flipside init                        # Configure API key (interactive)
+flipside quickstart [path]           # Generate example agents
+
 # Agents
 flipside agent init <name>           # Create new agent
 flipside agent validate <file>       # Validate YAML
@@ -177,7 +174,7 @@ flipside tools execute <tool> <json> # Execute a tool directly
 
 # Config
 flipside config show                 # Show current config
-flipside config init                 # Setup wizard
+flipside config set <key> <value>   # Update config value
 ```
 
 ### Global Flags
@@ -190,9 +187,15 @@ flipside config init                 # Setup wizard
 
 ---
 
+## API Reference
+
+The CLI is a wrapper around Flipside's public REST API. For building your own integrations, see the [API Reference](./docs/API.md).
+
+---
+
 ## Troubleshooting
 
-**"API key not found"** → Run `flipside config init`
+**"API key not found"** → Run `flipside init`
 
 **"Agent not found"** → Check `flipside agent list` for your agents
 
@@ -204,6 +207,5 @@ flipside config init                 # Setup wizard
 
 ## Links
 
+- [API Reference](./docs/API.md)
 - [Flipside Docs](https://docs.flipsidecrypto.xyz)
-- [Discord](https://discord.gg/flipside)
-- [GitHub Issues](https://github.com/flipsidecrypto/flipside-cli/issues)
