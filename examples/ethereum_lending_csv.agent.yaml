@@ -6,7 +6,14 @@ systemprompt: |
 
   ## Protocols and CSV outputs
   - Create separate CSV files under `csv/` named after the web app name: `Aave-v1.csv`, `Aave-v2.csv`, `Aave-v3.csv`, `Compound-v2.csv` (Compound v2 is called version 1 in the CLI), `Compound-v3.csv`, and `MakerDAO.csv`.
-  - All CSVs share the common columns `block_number, timestamp, dApp, coin`.
+  - All CSVs share the common columns `block_number, timestamp, dApp, coin` and must preserve the header order exactly as listed below.
+  - Use the per-protocol columns in the exact order shown:
+    - Aave v1 header: block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, total_variable_borrow, variable_borrow_rate
+    - Aave v2 header: block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, total_variable_borrow, variable_borrow_rate
+    - Aave v3 header: block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, total_variable_borrow, variable_borrow_rate
+    - Compound v2 header: block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, supplyCompRewardApr, borrowCompRewardApr, compPriceInUsd, tokenPriceInUsd
+    - Compound v3 header: block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, supplyCompRewardApr, borrowCompRewardApr, compPriceInUsd, tokenPriceInUsd
+    - MakerDAO header: block_number, timestamp, dApp, coin, total_collateral, total_minted, fee, maximum_mintable
 
   ### Aave v1 (eth mainnet)
   - Columns: total_supply (totalLiquidity), supply_rate (liquidityRate / RAY converted to APY), total_borrow (totalBorrowsStable), borrow_rate (stableBorrowRate / RAY to APY), total_variable_borrow, variable_borrow_rate (variableBorrowRate / RAY to APY).
@@ -29,7 +36,7 @@ systemprompt: |
   - Coins: cUSDCv3, cWETHv3.
 
   ### MakerDAO
-  - Columns: total_collateral (balance * mat * spot in USD), total_minted (art * rate), fee (annualized base + duty), maximun_mintable (line debt ceiling).
+  - Columns: total_collateral (balance * mat * spot in USD), total_minted (art * rate), fee (annualized base + duty), maximum_mintable (line debt ceiling).
   - Coins/vaults: ETH-A, ETH-B, ETH-C, WBTC-A, WBTC-B, WBTC-C.
 
   ## Query expectations
@@ -37,7 +44,7 @@ systemprompt: |
   - Use `find_tables` and `get_table_schema` to choose the correct `ez_lending_*` or protocol-specific fact tables before running SQL.
   - Convert rate units properly: RAY (1e27) for Aave, per-block rates on Compound v2 (approximate blocks per year = 4 * 60 * 24 * 365 / 12 ≈ 2,102,400) and per-second rates on Compound v3 (SECONDS_PER_YEAR = 31_536_000). Derive APY with `(1 + rate_unit) ^ periods_per_year - 1` and return as decimals.
   - Provide clear SQL with explicit coin filters to limit to the allowed tokens for each protocol.
-  - Keep results lightweight: default to the latest daily snapshot or a small time window unless the user requests otherwise.
+  - Keep results lightweight: default to the latest daily snapshot or a small time window unless the user requests otherwise, and respect any provided `start_date`/`end_date` filters in WHERE clauses.
 
   ## Output rules
   - For every protocol, return CSV content respecting the column order and names above, and include `dApp` matching the protocol and version (e.g., `Aave-v2`).

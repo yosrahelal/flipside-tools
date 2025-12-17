@@ -76,6 +76,12 @@ PY
 
 The agent produces one CSV per protocol (Aave v1/v2/v3, Compound v2/v3, MakerDAO) with the standardized columns described in the YAML.
 
+**Expected CSV headers (order matters):**
+
+- Aave v1/v2/v3: `block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, total_variable_borrow, variable_borrow_rate`
+- Compound v2/v3: `block_number, timestamp, dApp, coin, total_supply, supply_rate, total_borrow, borrow_rate, supplyCompRewardApr, borrowCompRewardApr, compPriceInUsd, tokenPriceInUsd`
+- MakerDAO: `block_number, timestamp, dApp, coin, total_collateral, total_minted, fee, maximum_mintable`
+
 ---
 
 ## Build Your Own Agent
