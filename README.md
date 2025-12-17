@@ -37,6 +37,7 @@ After running `flipside quickstart`, you'll have these example agents:
 |-------|------|--------------|
 | `defi_analyst` | chat | Analyze DeFi protocols - TVL, liquidity, DEX volume |
 | `top_tokens` | sub | Fetch top tokens by trading volume as structured JSON |
+| `ethereum_lending_csv` | sub | Export CSV snapshots for Ethereum lending protocols (Aave v1–v3, Compound v2/v3, MakerDAO) |
 
 ```bash
 # Chat agent - natural language
@@ -45,6 +46,35 @@ flipside agent run defi_analyst --message "Top DEX protocols by volume this week
 # Sub agent - structured JSON input
 flipside agent run top_tokens --data-json '{"chain": "ethereum", "limit": 10}'
 ```
+
+### Test the `ethereum_lending_csv` example
+
+The lending CSV agent ships in `examples/ethereum_lending_csv.agent.yaml` and expects Ethereum mainnet data. To try it:
+
+```bash
+# Validate and deploy the agent definition
+flipside agent validate examples/ethereum_lending_csv.agent.yaml
+flipside agent push examples/ethereum_lending_csv.agent.yaml
+
+# Run it with optional date filters (sub agent uses JSON input)
+flipside agent run ethereum_lending_csv \
+  --data-json '{"start_date": "2024-01-01", "end_date": "2024-01-07"}' \
+  --json > lending_csv_output.json
+
+# Write the returned CSV payloads to files under ./csv/
+python - <<'PY'
+import json, os
+payload = json.load(open('lending_csv_output.json'))
+os.makedirs('csv', exist_ok=True)
+for item in payload.get('csv_outputs', []):
+    path = os.path.join('csv', item['filename'])
+    with open(path, 'w') as f:
+        f.write(item['csv'])
+        print(f"wrote {path}")
+PY
+```
+
+The agent produces one CSV per protocol (Aave v1/v2/v3, Compound v2/v3, MakerDAO) with the standardized columns described in the YAML.
 
 ---
 
